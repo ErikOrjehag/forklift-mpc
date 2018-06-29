@@ -1,8 +1,8 @@
-#include "MPC.h"
+
 
 #ifndef MPC_PRIVATE
 #define MPC_PRIVATE
-#include "NavError.h"
+#include "MPC.h"
 #undef MPC_PRIVATE
 #endif // MPC_PRIVATE
 
@@ -12,101 +12,121 @@ class FG_eval
 public:
     typedef CPPAD_TESTVECTOR(CppAD::AD<double>) ADvector;
     const Eigen::VectorXd& K;
+    float desiredSpeed;
 
-    FG_eval(const Eigen::VectorXd& K)
-        : K(K)
+    FG_eval(const Eigen::VectorXd& K, float desiredSpeed)
+        : K(K), desiredSpeed(desiredSpeed)
     {
     }
 
     void operator()(ADvector& fg, const ADvector& x)
     {
-        // Cost
-
+        // Cost in position 0, rest is constraints
         fg[0] = 0.0;
 
-        for (int i = 0; i < mpc.N; i++) {
-            const auto cte = x[mpc.ID_FIRST_cte + i];
-            const auto epsi = x[mpc.ID_FIRST_epsi + i];
-            const auto v = x[mpc.ID_FIRST_v + i] - 1.5;
-            fg[0] += (mpc.W_cte * cte * cte + mpc.W_epsi * epsi * epsi + mpc.W_v * v * v);
+        // Cost of current state error
+        for (int i = 0; i < N; i++) {
+            const auto cte = x[ID_FIRST_cte + i];
+            const auto eheading = x[ID_FIRST_eheading + i];
+            const auto v = x[ID_FIRST_v + i] - desiredSpeed;
+            fg[0] += (W_cte*cte*cte + W_eheading*eheading*eheading + W_v*v*v);
         }
 
-        for (int i = 0; i < mpc.N - 1; ++i) {
-            const auto steer = x[mpc.ID_FIRST_steer + i];
-            const auto a = x[mpc.ID_FIRST_a + i];
-            fg[0] += (mpc.W_steer * steer * steer + mpc.W_a * a * a);
+        // Cost of using actuations to correct the error
+        for (int i = 0; i < N - 1; i++) {
+            const auto steer_ac = x[ID_FIRST_steer_ac + i];
+            const auto v_ac = x[ID_FIRST_v_ac + i];
+            fg[0] += (W_steer_ac*steer_ac*steer_ac + W_v_ac*v_ac*v_ac);
         }
 
-        for (int i = 0; i < mpc.N - 2; ++i) {
-            const auto dsteer = x[mpc.ID_FIRST_steer + i + 1] - x[mpc.ID_FIRST_steer + i];
-            const auto da = x[mpc.ID_FIRST_a + i + 1] - x[mpc.ID_FIRST_a + i];
-            fg[0] += (mpc.W_dsteer * dsteer * dsteer + mpc.W_da * da * da);
+        // Cost of changing the actuations quickly
+        for (int i = 0; i < N - 2; i++) {
+            const auto dsteer_ac = x[ID_FIRST_steer_ac + i + 1] - x[ID_FIRST_steer_ac + i];
+            const auto dv_ac = x[ID_FIRST_v_ac + i + 1] - x[ID_FIRST_v_ac + i];
+            fg[0] += (W_dsteer_ac*dsteer_ac*dsteer_ac + W_dv_ac*dv_ac*dv_ac);
       }
 
-      // Constraints
+      // Constraints given the state does not change
+      fg[1 + ID_FIRST_px]       = x[ID_FIRST_px];
+      fg[1 + ID_FIRST_py]       = x[ID_FIRST_py];
+      fg[1 + ID_FIRST_heading]  = x[ID_FIRST_heading];
+      fg[1 + ID_FIRST_steer]    = x[ID_FIRST_steer];
+      fg[1 + ID_FIRST_v]        = x[ID_FIRST_v];
+      fg[1 + ID_FIRST_cte]      = x[ID_FIRST_cte];
+      fg[1 + ID_FIRST_eheading] = x[ID_FIRST_eheading];
 
-      fg[mpc.ID_FIRST_px + 1] = x[mpc.ID_FIRST_px];
-      fg[mpc.ID_FIRST_py + 1] = x[mpc.ID_FIRST_py];
-      fg[mpc.ID_FIRST_psi + 1] = x[mpc.ID_FIRST_psi];
-      fg[mpc.ID_FIRST_v + 1] = x[mpc.ID_FIRST_v];
-      fg[mpc.ID_FIRST_cte + 1] = x[mpc.ID_FIRST_cte];
-      fg[mpc.ID_FIRST_epsi + 1] = x[mpc.ID_FIRST_epsi];
+       // Constraints based on our kinematic model
+      for (int i = 0; i < N - 1; i++) {
 
-       // constraints based on our kinematic model
-      for (int i = 0; i < mpc.N - 1; ++i) {
-            // where the current state variables of interest are stored
-            // stored for readability
-            const int ID_CURRENT_px = mpc.ID_FIRST_px + i;
-            const int ID_CURRENT_py = mpc.ID_FIRST_py + i;
-            const int ID_CURRENT_psi = mpc.ID_FIRST_psi + i;
-            const int ID_CURRENT_v = mpc.ID_FIRST_v + i;
-            const int ID_CURRENT_cte = mpc.ID_FIRST_cte + i;
-            const int ID_CURRENT_epsi = mpc.ID_FIRST_epsi + i;
-            const int ID_CURRENT_steer = mpc.ID_FIRST_steer + i;
-            const int ID_CURRENT_a = mpc.ID_FIRST_a + i;
+        // For readability
+        const int ID_CURRENT_px        = i + ID_FIRST_px;
+        const int ID_CURRENT_py        = i + ID_FIRST_py;
+        const int ID_CURRENT_heading   = i + ID_FIRST_heading;
+        const int ID_CURRENT_steer     = i + ID_FIRST_steer;
+        const int ID_CURRENT_v         = i + ID_FIRST_v;
+        const int ID_CURRENT_cte       = i + ID_FIRST_cte;
+        const int ID_CURRENT_eheading  = i + ID_FIRST_eheading;
+        const int ID_CURRENT_v_ac      = i + ID_FIRST_v_ac;
+        const int ID_CURRENT_steer_ac  = i + ID_FIRST_steer_ac;
 
-            //current state and actuations
-            const auto px0 = x[ID_CURRENT_px];
-            const auto py0 = x[ID_CURRENT_py];
-            const auto psi0 = x[ID_CURRENT_psi];
-            const auto v0 = x[ID_CURRENT_v];
-            const auto cte0 = x[ID_CURRENT_cte];
-            const auto epsi0 = x[ID_CURRENT_epsi];
-            const auto delta0 = x[ID_CURRENT_steer];
-            const auto a0 = x[ID_CURRENT_a];
+        // Current state and actuations
+        const auto px0       = x[ID_CURRENT_px];
+        const auto py0       = x[ID_CURRENT_py];
+        const auto heading0  = x[ID_CURRENT_heading];
+        const auto steer0    = x[ID_CURRENT_steer];
+        const auto v0        = x[ID_CURRENT_v];
+        const auto cte0      = x[ID_CURRENT_cte];
+        const auto eheading0 = x[ID_CURRENT_heading];
+        const auto v_ac0     = x[ID_CURRENT_v_ac];
+        const auto steer_ac0 = x[ID_CURRENT_steer_ac];
 
-            // next state
-            const auto px1 = x[ID_CURRENT_px + 1];
-            const auto py1 = x[ID_CURRENT_py + 1];
-            const auto psi1 = x[ID_CURRENT_psi + 1];
-            const auto v1 = x[ID_CURRENT_v + 1];
-            const auto cte1 = x[ID_CURRENT_cte + 1];
-            const auto epsi1 = x[ID_CURRENT_epsi + 1];
+        // Next state
+        const auto px1       = x[1 + ID_CURRENT_px];
+        const auto py1       = x[1 + ID_CURRENT_py];
+        const auto heading1  = x[1 + ID_CURRENT_heading];
+        const auto steer1    = x[1 + ID_CURRENT_steer];
+        const auto v1        = x[1 + ID_CURRENT_v];
+        const auto cte1      = x[1 + ID_CURRENT_cte];
+        const auto eheading1 = x[1 + ID_CURRENT_eheading];
 
-            /*// relationship of current state + actuations and next state
-            // based on our kinematic model
-            Forklift fork = forklift;
-            fork.frame.pos[0] = px0;
-            fork.frame.pos[1] = py0;
-            fork.frame.angle = psi0;
-            fork.speed = v0 + a0 * mpc.DT;
-            fork.frame = fork.predict(mpc.DT);
-            NavError navErr = NavError.calcNavError(path, fork.frame);
+        // Desired py and heading
+        const auto py_desired = K[3] * px0 * px0 * px0 + K[2] * px0 * px0 + K[1] * px0 + K[0];
+        const auto heading_desired = CppAD::atan(3.0 * K[3] * px0 * px0 + 2.0 * K[2] * px0 + K[1]);
 
-            const auto px1_f = fork.frame.pos[0];
-            const auto py1_f = fork.frame.pos[1];
-            const auto psi1_f = fork.frame.angle;
-            const auto v1_f = fork.speed;
-            const auto cte1_f = navErr.linear;
-            const auto epsi1_f = navErr.angle;
+        // Relationship of current state + actuations and next state
 
-            // store the constraint expression of two consecutive states
-            fg[ID_CURRENT_px + 2] = px1 - px1_f;
-            fg[ID_CURRENT_py + 2] = py1 - py1_f;
-            fg[ID_CURRENT_psi + 2] = psi1 - psi1_f;
-            fg[ID_CURRENT_v + 2] = v1 - v1_f;
-            fg[ID_CURRENT_cte + 2] = cte1 - cte1_f;
-            fg[ID_CURRENT_epsi + 2] = epsi1 - epsi1_f;*/
+        ForkliftModel<CppAD::AD<double>> model;
+        model.position[0] = px0;
+        model.position[1] = py0;
+        model.heading = heading0;
+        model.steer = steer0;
+        model.speed = v0;
+        model.update(DT);
+
+        /*const auto cte1_f = py_desired - model.position[0]; // maybe invert?
+        const auto eheading1_f = model.heading - heading_desired; // ?
+        const auto v1_f = v0;
+        const auto steer1_f = steer0;
+        const auto px1_f = model.position[0];
+        const auto py1_f = model.position[1];
+        const auto heading1_f = model.heading;*/
+
+        const auto px1_f = px0 + model.dx;
+        const auto py1_f = py0 + model.dy;
+        const auto heading1_f = heading0 + model.da;
+        const auto v1_f = v0 - v0 + v_ac0;
+        const auto steer1_f = steer0 - steer0 + steer_ac0;
+        const auto cte1_f = py_desired - py0 + model.dy;
+        const auto eheading1_f = heading0 - heading_desired + model.da;
+
+        // Store the constraint expression of two consecutive states
+        fg[2 + ID_CURRENT_px]      = px1 - px1_f;
+        fg[2 + ID_CURRENT_py]      = py1 - py1_f;
+        fg[2 + ID_CURRENT_heading] = heading1 - heading1_f;
+        fg[2 + ID_CURRENT_steer]   = steer1 - steer1_f;
+        fg[2 + ID_CURRENT_v]       = v1 - v1_f;
+        fg[2 + ID_FIRST_cte]       = cte1 - cte1_f;
+        fg[2 + ID_FIRST_eheading]  = eheading1 - eheading1_f;
       }
     }
 };
@@ -115,22 +135,36 @@ MPC::MPC(ForkliftModel<double>& model)
     : model(model)
 {
     x.resize(NX);
+    xLowerBound.resize(NX);
+    xUpperBound.resize(NX);
+    gLowerBound.resize(NG);
+    gUpperBound.resize(NG);
 
+    // Set all states to zero
     for (int i = 0; i < x.size(); i++) {
         x[i] = 0;
     }
 
-    xLowerBound.resize(NX);
-    xUpperBound.resize(NX);
-
-    for (int i = 0; i < ID_FIRST_steer_ac; i++) {
+    // Limits of state variables
+    for (int i = 0; i < ID_FIRST_steer; i++) {
         xLowerBound[i] = -1.0e10;
         xUpperBound[i] = 1.0e10;
     }
 
+    for (int i = ID_FIRST_steer; i < ID_FIRST_v; i++) {
+        xLowerBound[i] = -model.MAX_STEER;
+        xUpperBound[i] = model.MAX_STEER;
+    }
+
+    for (int i = ID_FIRST_v; i < ID_FIRST_steer_ac; i++) {
+        xLowerBound[i] = -model.MAX_SPEED;
+        xUpperBound[i] = model.MAX_SPEED;
+    }
+
+    // Limits of actuation inputs
     for (int i = ID_FIRST_steer_ac; i < ID_FIRST_v_ac; i++) {
-        xLowerBound[i] = M_PI / -2;
-        xUpperBound[i] = M_PI / 2;
+        xLowerBound[i] = -model.MAX_STEER;
+        xUpperBound[i] = model.MAX_STEER;
     }
 
     for (int i = ID_FIRST_v_ac; i < NX; i++) {
@@ -138,22 +172,21 @@ MPC::MPC(ForkliftModel<double>& model)
         xUpperBound[i] = model.MAX_SPEED;
     }
 
-    gLowerBound.resize(NG);
-    gUpperBound.resize(NG);
-
+    /*  The first constraint for each state variable
+        refers to the initial state conditions. This
+        will be initialized when solve() is called.
+        The succeeding constraints refer to the
+        relationship between succeeding states based
+        on our kinematic model of the system. */
     for (int i = 0; i < NG; i++) {
         gLowerBound[i] = 0.0;
         gUpperBound[i] = 0.0;
     }
 }
 
-MPC::~MPC()
+void MPC::solve(const Eigen::VectorXd& K, double desiredSpeed)
 {
-    //dtor
-}
-
-void MPC::solve(const Eigen::VectorXd& K)
-{
+    // In local frame of reference
     const double px = 0;
     const double py = 0;
     const double heading = 0;
@@ -192,10 +225,13 @@ void MPC::solve(const Eigen::VectorXd& K)
     //**************************************************************
 
     // object that computes objective and constraints
-    FG_eval fgEval(K);
+    FG_eval fgEval(K, desiredSpeed);
 
     // options for IPOPT solver
     std::string options;
+
+    //options += "Retape  true\n";
+
     // Uncomment this if you'd like more print information
     options += "Integer print_level  0\n";
     // NOTE: Setting sparse to true allows the solver to take advantage
@@ -226,7 +262,7 @@ void MPC::solve(const Eigen::VectorXd& K)
     ok &= solution.status == CppAD::ipopt::solve_result<Dvector>::success;
 
     if (ok) {
-        std::cout << "OK! Cost:" << cost << std::endl;
+        //std::cout << "OK! Cost:" << cost << std::endl;
     } else {
         std::cout << "SOMETHING IS WRONG!" << cost << std::endl;
     }
@@ -236,15 +272,16 @@ void MPC::solve(const Eigen::VectorXd& K)
     //**************************************************************
 
     this->steer_ac = solution.x[ID_FIRST_steer_ac];
-    this->v_ac = solution.x[ID_FIRST_v_ac];
+    this->speed_ac = solution.x[ID_FIRST_v_ac];
 
+    //std::cout << "result (steer_ac: " << this->steer_ac << ", speed_ac: " << this->speed_ac << ")" << std::endl;
 
     this->prediction.clear();
 
     for (int i = 0; i < N; ++i) {
         const double px = solution.x[ID_FIRST_px + i];
         const double py = solution.x[ID_FIRST_py + i];
-        this->prediction.emplace_back(Eigen::Vector2d(px, py));
+        this->prediction.push_back(Eigen::Vector2d(px, py));
     }
 
 }
@@ -253,6 +290,6 @@ void MPC::solve(const Eigen::VectorXd& K)
 void MPC::draw(sf::RenderWindow& window, TransformStack& ts)
 {
     std::vector<sf::Vertex> vertices;
-    for (Eigen::Vector2d& p : prediction) vertices.push_back(sf::Vertex(sf::Vector2f(p[0], p[1]), sf::Color::Yellow));
+    for (Eigen::Vector2d& p : prediction) vertices.push_back(sf::Vertex(sf::Vector2f(p[0], p[1]), sf::Color::Blue));
     window.draw(&vertices[0], vertices.size(), sf::LineStrip, ts);
 }

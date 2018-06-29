@@ -17,15 +17,20 @@ template<typename T>
 void ForkliftModel<T>::update(double dt)
 {
     if (steer == 0) {
-        position[0] += dt * speed * cos(heading);
-        position[1] += dt * speed * sin(heading);
+        this->da = 0;
+        this->dx = dt * speed * cos(heading);
+        this->dy = dt * speed * sin(heading);
+        position[0] += dx;
+        position[1] += dy;
     } else {
         T r = size[0] / sin(steer);
-        T da = dt * speed / r;
+        this->da = dt * speed / r;
         heading  += da;
         T h = r * cos(steer);
-        position[0] += h * sin(heading + da) - h * sin(heading);
-        position[1] -= h * cos(heading + da) - h * cos(heading);
+        this->dx =    h * sin(heading + da) - h * sin(heading);
+        this->dy = - (h * cos(heading + da) - h * cos(heading));
+        position[0] += dx;
+        position[1] += dy;
     }
 }
 

@@ -1,5 +1,7 @@
 # depslib dependency file v1.0
-1530025510 source:c:\users\bt6073\desktop\codeblocks\mpc\main.cpp
+1530200972 source:c:\users\bt6073\desktop\codeblocks\mpc\main.cpp
+	<cppad/ipopt/solve.hpp>
+	<iostream>
 	<SFML/Graphics.hpp>
 	"Forklift.h"
 	"Frame.h"
@@ -425,11 +427,11 @@
 	<SFML/Graphics.hpp>
 	<stack>
 
-1529589124 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forklift.cpp
+1530198766 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forklift.cpp
 	"Forklift.h"
 	<iostream>
 
-1529588667 c:\users\bt6073\desktop\codeblocks\mpc\include\forklift.h
+1530198838 c:\users\bt6073\desktop\codeblocks\mpc\include\forklift.h
 	<math.h>
 	<SFML/Graphics.hpp>
 	"Eigen/Dense"
@@ -2326,11 +2328,10 @@
 
 1514799133 c:\users\bt6073\desktop\cppad-20180000.0\cppad\ipopt\solve_result.hpp
 
-1529941063 source:c:\users\bt6073\desktop\codeblocks\mpc\src\mpc.cpp
+1530199889 source:c:\users\bt6073\desktop\codeblocks\mpc\src\mpc.cpp
 	"MPC.h"
-	"NavError.h"
 
-1530115804 c:\users\bt6073\desktop\codeblocks\mpc\include\mpc.h
+1530199877 c:\users\bt6073\desktop\codeblocks\mpc\include\mpc.h
 	<cppad/cppad.hpp>
 	<cppad/ipopt/solve.hpp>
 	"Forklift.h"
@@ -2342,11 +2343,11 @@
 1529585101 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftstate.h
 	<Eigen/Dense>
 
-1529589304 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forkliftmodel.cpp
+1530197467 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forkliftmodel.cpp
 	"ForkliftModel.h"
 	<cppad/cppad.hpp>
 
-1529589078 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftmodel.h
+1530197458 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftmodel.h
 	<Eigen/Dense>
 
 1529930880 c:\users\bt6073\desktop\ipopt-3.7.1-win64-icl10.1\include\coin\ipipoptapplication.hpp

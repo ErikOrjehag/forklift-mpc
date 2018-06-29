@@ -87,7 +87,7 @@ void Forklift::draw(sf::RenderWindow& window, TransformStack& ts)
     ts.pop();
 }
 
-void Forklift::update(double dt)
+void Forklift::control(double dt)
 {
     switch (driveCmd) {
     case FORWARD:
@@ -105,7 +105,10 @@ void Forklift::update(double dt)
 
     speed = std::max(-model.MAX_SPEED, std::min(model.MAX_SPEED, speed));
     steer = std::max(-model.MAX_STEER, std::min(model.MAX_STEER, steer));
+}
 
+void Forklift::update(double dt)
+{
     model.speed = speed;
     model.steer = steer;
     model.update(dt);

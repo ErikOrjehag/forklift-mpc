@@ -34,6 +34,7 @@ class Forklift
         SteerCommand steerCmd = NONE;
 
         void draw(sf::RenderWindow& window, TransformStack& ts);
+        void control(double dt);
         void update(double dt);
 
     protected:
