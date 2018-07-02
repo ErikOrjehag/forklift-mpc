@@ -1,36 +1,26 @@
 #include "ForkliftModel.h"
 #include <cppad/cppad.hpp>
+#include <cmath>
 
 template<typename T>
-ForkliftModel<T>::ForkliftModel() : position(0, 0), size(1.5, 1)
+ForkliftModel<T>::ForkliftModel()
+: position(0, 0), size(1.5, 1)
 {
-    position.dot(size);
 }
 
 template<typename T>
-ForkliftModel<T>::~ForkliftModel()
-{
-
-}
-
-template<typename T>
-void ForkliftModel<T>::update(double dt)
+void ForkliftModel<T>::update(double dt, T (*SIN)(T), T (*COS)(T))
 {
     if (steer == 0) {
-        this->da = 0;
-        this->dx = dt * speed * cos(heading);
-        this->dy = dt * speed * sin(heading);
-        position[0] += dx;
-        position[1] += dy;
+        position[0] += dt * speed * COS(heading);
+        position[1] += dt * speed * SIN(heading);
     } else {
-        T r = size[0] / sin(steer);
-        this->da = dt * speed / r;
+        T r = size[0] / SIN(steer);
+        T da = dt * speed / r;
         heading  += da;
-        T h = r * cos(steer);
-        this->dx =    h * sin(heading + da) - h * sin(heading);
-        this->dy = - (h * cos(heading + da) - h * cos(heading));
-        position[0] += dx;
-        position[1] += dy;
+        T h = r * COS(steer);
+        position[0] +=    h * SIN(heading + da) - h * SIN(heading);
+        position[1] += - (h * COS(heading + da) - h * COS(heading));
     }
 }
 

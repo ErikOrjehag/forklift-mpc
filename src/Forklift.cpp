@@ -1,5 +1,6 @@
 #include "Forklift.h"
 #include <iostream>
+#include <cmath>
 
 Forklift::Forklift() {}
 
@@ -50,7 +51,7 @@ void Forklift::draw(sf::RenderWindow& window, TransformStack& ts)
     ts.rotate(model.heading * 180 / M_PI);
 
     window.draw(debugLine, ts);
-    window.draw(origo, ts);
+    //window.draw(origo, ts);
 
     ts.push();
     ts.translate(model.size[0] + 0.3, 0);
@@ -111,5 +112,8 @@ void Forklift::update(double dt)
 {
     model.speed = speed;
     model.steer = steer;
-    model.update(dt);
+
+    double (*s)(double) = static_cast<double(*)(double)>(&std::sin);
+    double (*c)(double) = static_cast<double(*)(double)>(&std::cos);
+    model.update(dt, s, c);
 }

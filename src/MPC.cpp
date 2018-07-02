@@ -46,7 +46,7 @@ public:
             fg[0] += (W_dsteer_ac*dsteer_ac*dsteer_ac + W_dv_ac*dv_ac*dv_ac);
       }
 
-      // Constraints given the state does not change
+      // Constraints for first state
       fg[1 + ID_FIRST_px]       = x[ID_FIRST_px];
       fg[1 + ID_FIRST_py]       = x[ID_FIRST_py];
       fg[1 + ID_FIRST_heading]  = x[ID_FIRST_heading];
@@ -55,39 +55,28 @@ public:
       fg[1 + ID_FIRST_cte]      = x[ID_FIRST_cte];
       fg[1 + ID_FIRST_eheading] = x[ID_FIRST_eheading];
 
-       // Constraints based on our kinematic model
-      for (int i = 0; i < N - 1; i++) {
+       // Constraints based on our kinematic model for rest of states
+      for (int t = 1; t < N; t++) {
 
-        // For readability
-        const int ID_CURRENT_px        = i + ID_FIRST_px;
-        const int ID_CURRENT_py        = i + ID_FIRST_py;
-        const int ID_CURRENT_heading   = i + ID_FIRST_heading;
-        const int ID_CURRENT_steer     = i + ID_FIRST_steer;
-        const int ID_CURRENT_v         = i + ID_FIRST_v;
-        const int ID_CURRENT_cte       = i + ID_FIRST_cte;
-        const int ID_CURRENT_eheading  = i + ID_FIRST_eheading;
-        const int ID_CURRENT_v_ac      = i + ID_FIRST_v_ac;
-        const int ID_CURRENT_steer_ac  = i + ID_FIRST_steer_ac;
-
-        // Current state and actuations
-        const auto px0       = x[ID_CURRENT_px];
-        const auto py0       = x[ID_CURRENT_py];
-        const auto heading0  = x[ID_CURRENT_heading];
-        const auto steer0    = x[ID_CURRENT_steer];
-        const auto v0        = x[ID_CURRENT_v];
-        const auto cte0      = x[ID_CURRENT_cte];
-        const auto eheading0 = x[ID_CURRENT_heading];
-        const auto v_ac0     = x[ID_CURRENT_v_ac];
-        const auto steer_ac0 = x[ID_CURRENT_steer_ac];
+        // State + actuations
+        const auto px0       = x[t - 1 + ID_FIRST_px];
+        const auto py0       = x[t - 1 + ID_FIRST_py];
+        const auto heading0  = x[t - 1 + ID_FIRST_heading];
+        const auto steer0    = x[t - 1 + ID_FIRST_steer];
+        const auto v0        = x[t - 1 + ID_FIRST_v];
+        const auto cte0      = x[t - 1 + ID_FIRST_cte];
+        const auto eheading0 = x[t - 1 + ID_FIRST_heading];
+        const auto v_ac0     = x[t - 1 + ID_FIRST_v_ac];
+        const auto steer_ac0 = x[t - 1 + ID_FIRST_steer_ac];
 
         // Next state
-        const auto px1       = x[1 + ID_CURRENT_px];
-        const auto py1       = x[1 + ID_CURRENT_py];
-        const auto heading1  = x[1 + ID_CURRENT_heading];
-        const auto steer1    = x[1 + ID_CURRENT_steer];
-        const auto v1        = x[1 + ID_CURRENT_v];
-        const auto cte1      = x[1 + ID_CURRENT_cte];
-        const auto eheading1 = x[1 + ID_CURRENT_eheading];
+        const auto px1       = x[t + ID_FIRST_px];
+        const auto py1       = x[t + ID_FIRST_py];
+        const auto heading1  = x[t + ID_FIRST_heading];
+        const auto steer1    = x[t + ID_FIRST_steer];
+        const auto v1        = x[t + ID_FIRST_v];
+        const auto cte1      = x[t + ID_FIRST_cte];
+        const auto eheading1 = x[t + ID_FIRST_eheading];
 
         // Desired py and heading
         const auto py_desired = K[3] * px0 * px0 * px0 + K[2] * px0 * px0 + K[1] * px0 + K[0];
@@ -101,32 +90,20 @@ public:
         model.heading = heading0;
         model.steer = steer0;
         model.speed = v0;
-        model.update(DT);
 
-        /*const auto cte1_f = py_desired - model.position[0]; // maybe invert?
-        const auto eheading1_f = model.heading - heading_desired; // ?
-        const auto v1_f = v0;
-        const auto steer1_f = steer0;
-        const auto px1_f = model.position[0];
-        const auto py1_f = model.position[1];
-        const auto heading1_f = model.heading;*/
+        CppAD::AD<double> (*s)(CppAD::AD<double>) = [](CppAD::AD<double> x) { return CppAD::sin<double>(x); };
+        CppAD::AD<double> (*c)(CppAD::AD<double>) = [](CppAD::AD<double> x) { return CppAD::cos<double>(x); };
+        model.update(DT, s, c);
 
-        const auto px1_f = px0 + model.dx;
-        const auto py1_f = py0 + model.dy;
-        const auto heading1_f = heading0 + model.da;
-        const auto v1_f = v0 - v0 + v_ac0;
-        const auto steer1_f = steer0 - steer0 + steer_ac0;
-        const auto cte1_f = py_desired - py0 + model.dy;
-        const auto eheading1_f = heading0 - heading_desired + model.da;
-
-        // Store the constraint expression of two consecutive states
-        fg[2 + ID_CURRENT_px]      = px1 - px1_f;
-        fg[2 + ID_CURRENT_py]      = py1 - py1_f;
-        fg[2 + ID_CURRENT_heading] = heading1 - heading1_f;
-        fg[2 + ID_CURRENT_steer]   = steer1 - steer1_f;
-        fg[2 + ID_CURRENT_v]       = v1 - v1_f;
-        fg[2 + ID_FIRST_cte]       = cte1 - cte1_f;
-        fg[2 + ID_FIRST_eheading]  = eheading1 - eheading1_f;
+        // Store the constraint expression of two consecutive states.
+        // The idea here is to constraint this value to be 0.
+        fg[1 + t + ID_FIRST_px]      = px1 - model.position[0];
+        fg[1 + t + ID_FIRST_py]      = py1 - model.position[1];
+        fg[1 + t + ID_FIRST_heading] = heading1 - model.heading;
+        fg[1 + t + ID_FIRST_steer]   = steer1 - (steer0 + steer_ac0 * DT);
+        fg[1 + t + ID_FIRST_v]       = v1 - (v0 + v_ac0 * DT);
+        fg[1 + t + ID_FIRST_cte]       = cte1 - (model.position[1] - py_desired);
+        fg[1 + t + ID_FIRST_eheading]  = eheading1 - (model.heading - heading_desired);
       }
     }
 };
@@ -236,8 +213,9 @@ void MPC::solve(const Eigen::VectorXd& K, double desiredSpeed)
     options += "Integer print_level  0\n";
     // NOTE: Setting sparse to true allows the solver to take advantage
     // of sparse routines, this makes the computation MUCH FASTER.
-    options += "Sparse  true        forward\n";
-    options += "Sparse  true        reverse\n";
+    //options += "Sparse  true        forward\n";
+    //options += "Sparse  true        reverse\n";
+    options += "Retape true\n";
     // NOTE: Currently the solver has a maximum time limit of 0.5 seconds.
     options += "Numeric max_cpu_time          0.5\n";
 
@@ -290,6 +268,6 @@ void MPC::solve(const Eigen::VectorXd& K, double desiredSpeed)
 void MPC::draw(sf::RenderWindow& window, TransformStack& ts)
 {
     std::vector<sf::Vertex> vertices;
-    for (Eigen::Vector2d& p : prediction) vertices.push_back(sf::Vertex(sf::Vector2f(p[0], p[1]), sf::Color::Blue));
+    for (Eigen::Vector2d& p : prediction) vertices.push_back(sf::Vertex(sf::Vector2f(p[0], p[1]), sf::Color::Magenta));
     window.draw(&vertices[0], vertices.size(), sf::LineStrip, ts);
 }

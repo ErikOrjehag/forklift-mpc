@@ -1,7 +1,5 @@
 # depslib dependency file v1.0
-1530200972 source:c:\users\bt6073\desktop\codeblocks\mpc\main.cpp
-	<cppad/ipopt/solve.hpp>
-	<iostream>
+1530540537 source:c:\users\bt6073\desktop\codeblocks\mpc\main.cpp
 	<SFML/Graphics.hpp>
 	"Forklift.h"
 	"Frame.h"
@@ -10,6 +8,7 @@
 	"NavError.h"
 	"MPC.h"
 	"Utils.h"
+	<stdlib.h>
 
 1529046651 c:\users\bt6073\desktop\sfml-2.5.0\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -427,11 +426,12 @@
 	<SFML/Graphics.hpp>
 	<stack>
 
-1530198766 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forklift.cpp
+1530538289 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forklift.cpp
 	"Forklift.h"
 	<iostream>
+	<cmath>
 
-1530198838 c:\users\bt6073\desktop\codeblocks\mpc\include\forklift.h
+1530520868 c:\users\bt6073\desktop\codeblocks\mpc\include\forklift.h
 	<math.h>
 	<SFML/Graphics.hpp>
 	"Eigen/Dense"
@@ -2328,10 +2328,10 @@
 
 1514799133 c:\users\bt6073\desktop\cppad-20180000.0\cppad\ipopt\solve_result.hpp
 
-1530199889 source:c:\users\bt6073\desktop\codeblocks\mpc\src\mpc.cpp
+1530538375 source:c:\users\bt6073\desktop\codeblocks\mpc\src\mpc.cpp
 	"MPC.h"
 
-1530199877 c:\users\bt6073\desktop\codeblocks\mpc\include\mpc.h
+1530532967 c:\users\bt6073\desktop\codeblocks\mpc\include\mpc.h
 	<cppad/cppad.hpp>
 	<cppad/ipopt/solve.hpp>
 	"Forklift.h"
@@ -2343,11 +2343,12 @@
 1529585101 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftstate.h
 	<Eigen/Dense>
 
-1530197467 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forkliftmodel.cpp
+1530526547 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forkliftmodel.cpp
 	"ForkliftModel.h"
 	<cppad/cppad.hpp>
+	<cmath>
 
-1530197458 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftmodel.h
+1530526540 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftmodel.h
 	<Eigen/Dense>
 
 1529930880 c:\users\bt6073\desktop\ipopt-3.7.1-win64-icl10.1\include\coin\ipipoptapplication.hpp
@@ -2615,7 +2616,7 @@
 	<SFML/Graphics.hpp>
 	"TransformStack.h"
 
-1530010313 source:c:\users\bt6073\desktop\codeblocks\mpc\src\utils.cpp
+1530528769 source:c:\users\bt6073\desktop\codeblocks\mpc\src\utils.cpp
 	"Utils.h"
 	<algorithm>
 	<iostream>

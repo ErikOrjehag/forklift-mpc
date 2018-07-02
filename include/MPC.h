@@ -6,8 +6,8 @@
 #include "Forklift.h"
 
 #ifdef MPC_PRIVATE
-const double DT = 0.016;
-const int N = 20; // How many states we "lookahead" in the future
+const double DT = 0.2;
+const int N = 5; // How many states we "lookahead" in the future
 
 const int NUMBER_OF_STATES = 7; // px, py, heading, steer, v, cte, eheading
 const int NUMBER_OF_ACTUATIONS = 2; // steer, v
@@ -25,13 +25,14 @@ const int ID_FIRST_v = ID_FIRST_steer + N;
 const int ID_FIRST_steer_ac = ID_FIRST_v + N;
 const int ID_FIRST_v_ac = ID_FIRST_steer_ac + N - 1;
 
-const double W_cte = 1.0;
-const double W_eheading = 0.0;
-const double W_v = 0.0;
-const double W_steer_ac = 0.0;
-const double W_v_ac = 0.0;
-const double W_dv_ac = 0.0;
-const double W_dsteer_ac = 0.0;
+const double W_cte = 1000.0;
+const double W_eheading = 150.0;
+const double W_v = 50.0;
+const double W_steer = 0.4;
+const double W_steer_ac = 0.2;
+const double W_v_ac = 0.2;
+const double W_dv_ac = 0.1;
+const double W_dsteer_ac = 0.1;
 #endif // MPC_PRIVATE
 
 typedef CPPAD_TESTVECTOR(double) Dvector;
