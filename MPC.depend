@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1530540537 source:c:\users\bt6073\desktop\codeblocks\mpc\main.cpp
+1530800147 source:c:\users\bt6073\desktop\codeblocks\mpc\main.cpp
 	<SFML/Graphics.hpp>
 	"Forklift.h"
 	"Frame.h"
@@ -9,6 +9,8 @@
 	"MPC.h"
 	"Utils.h"
 	<stdlib.h>
+	"MultiBeizer.h"
+	"Grid.h"
 
 1529046651 c:\users\bt6073\desktop\sfml-2.5.0\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -426,7 +428,7 @@
 	<SFML/Graphics.hpp>
 	<stack>
 
-1530538289 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forklift.cpp
+1530792913 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forklift.cpp
 	"Forklift.h"
 	<iostream>
 	<cmath>
@@ -1167,11 +1169,11 @@
 1529337053 source:c:\users\bt6073\desktop\codeblocks\mpc\src\frame.cpp
 	"Frame.h"
 
-1530009488 source:c:\users\bt6073\desktop\codeblocks\mpc\src\beizercurve.cpp
+1530798908 source:c:\users\bt6073\desktop\codeblocks\mpc\src\beizercurve.cpp
 	"BeizerCurve.h"
 	<iostream>
 
-1529484744 c:\users\bt6073\desktop\codeblocks\mpc\include\beizercurve.h
+1530793950 c:\users\bt6073\desktop\codeblocks\mpc\include\beizercurve.h
 	<vector>
 	<Eigen/Dense>
 	<SFML/Graphics.hpp>
@@ -2343,12 +2345,12 @@
 1529585101 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftstate.h
 	<Eigen/Dense>
 
-1530526547 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forkliftmodel.cpp
+1530544410 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forkliftmodel.cpp
 	"ForkliftModel.h"
 	<cppad/cppad.hpp>
 	<cmath>
 
-1530526540 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftmodel.h
+1530544203 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftmodel.h
 	<Eigen/Dense>
 
 1529930880 c:\users\bt6073\desktop\ipopt-3.7.1-win64-icl10.1\include\coin\ipipoptapplication.hpp
@@ -2620,4 +2622,22 @@
 	"Utils.h"
 	<algorithm>
 	<iostream>
+
+1530795122 source:c:\users\bt6073\desktop\codeblocks\mpc\src\multibeizer.cpp
+	"MultiBeizer.h"
+
+1530793445 c:\users\bt6073\desktop\codeblocks\mpc\include\multibeizer.h
+	"BeizerCurve.h"
+	<vector>
+	"TransformStack.h"
+	<SFML/Graphics.hpp>
+	<Eigen/Dense>
+
+1530800037 source:c:\users\bt6073\desktop\codeblocks\mpc\src\grid.cpp
+	"Grid.h"
+
+1530800283 c:\users\bt6073\desktop\codeblocks\mpc\include\grid.h
+	<SFML/Graphics.hpp>
+	"TransformStack.h"
+	<Eigen/Dense>
 

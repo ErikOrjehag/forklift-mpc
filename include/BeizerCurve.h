@@ -18,7 +18,7 @@ class BeizerCurve
         void add(Eigen::Vector2d point);
         Eigen::Vector2d getPoint(float t);
         std::vector<Eigen::Vector2d> getCurve();
-        void draw(sf::RenderWindow& window, TransformStack& ts);
+        void draw(sf::RenderWindow& window, TransformStack& ts, sf::Color color = sf::Color::Blue);
 
     protected:
 

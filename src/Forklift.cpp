@@ -98,7 +98,7 @@ void Forklift::control(double dt)
         speed -= model.MAX_SPEED_DELTA * dt;
         break;
     default:
-        speed *= 0.97;
+        speed *= 0.96; // Drag
     }
 
     if (steerCmd == RIGHT) steer -= model.MAX_STEER_DELTA * dt;

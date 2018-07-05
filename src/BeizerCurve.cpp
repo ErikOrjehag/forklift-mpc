@@ -56,21 +56,22 @@ std::vector<Eigen::Vector2d> BeizerCurve::getCurve()
     return vertices;
 }
 
-void BeizerCurve::draw(sf::RenderWindow& window, TransformStack& ts)
+void BeizerCurve::draw(sf::RenderWindow& window, TransformStack& ts, sf::Color color)
 {
 
     std::vector<Eigen::Vector2d> curve = getCurve();
     std::vector<sf::Vertex> vertices;
-    for (Eigen::Vector2d& p : curve) vertices.push_back(sf::Vertex(sf::Vector2f(p[0], p[1]), sf::Color::Blue));
+    for (Eigen::Vector2d& p : curve) vertices.push_back(sf::Vertex(sf::Vector2f(p[0], p[1]), color));
     window.draw(&vertices[0], vertices.size(), sf::LineStrip, ts);
 
     sf::CircleShape  circle;
-    circle.setRadius(0.05);
-    circle.setOutlineColor(sf::Color::Blue);
+    double radius = 0.05;
+    circle.setRadius(radius);
+    circle.setOutlineColor(color);
     circle.setOutlineThickness(0.01);
 
     for (Eigen::Vector2d& p : points) {
-        circle.setPosition(sf::Vector2f(p[0]-0.025, p[1]-0.025));
+        circle.setPosition(sf::Vector2f(p[0]-radius, p[1]-radius));
         window.draw(circle, ts);
     }
 }
