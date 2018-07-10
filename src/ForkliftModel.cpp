@@ -24,5 +24,14 @@ void ForkliftModel<T>::update(double dt, T (*SIN)(T), T (*COS)(T))
     }
 }
 
+template<typename T>
+void ForkliftModel<T>::updateApproximate(double dt, T (*SIN)(T), T (*COS)(T))
+{
+    double magic = 0.8;
+    position[0] += dt * speed * COS(heading);
+    position[1] += dt * speed * SIN(heading);
+    heading += dt * steer * speed / (size[0] * magic);
+}
+
 template class ForkliftModel<double>;
 template class ForkliftModel<CppAD::AD<double>>;

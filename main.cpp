@@ -13,6 +13,7 @@
 
 const int WINDOW_WIDTH = 960;
 const int WINDOW_HEIGHT = 600;
+const int PX_PER_METER = 70;
 
 int main()
 {
@@ -75,15 +76,34 @@ int main()
 
     BeizerCurve beizer8;
     beizer8.add(Eigen::Vector2d(-3, -2));
-    beizer8.add(Eigen::Vector2d(-1, -2));
-    beizer8.add(Eigen::Vector2d(-1, 0));
+    beizer8.add(Eigen::Vector2d(-3, -1));
+    beizer8.add(Eigen::Vector2d(-2, -1));
     multiBeizer.add(beizer8);
 
     BeizerCurve beizer9;
+    beizer9.add(Eigen::Vector2d(-2, -1));
+    beizer9.add(Eigen::Vector2d(-1, -1));
     beizer9.add(Eigen::Vector2d(-1, 0));
-    beizer9.add(Eigen::Vector2d(-1, 3));
-    beizer9.add(Eigen::Vector2d(1, 3));
-    //multiBeizer.add(beizer9);
+    multiBeizer.add(beizer9);
+
+    BeizerCurve beizer10;
+    beizer10.add(Eigen::Vector2d(-1, 0));
+    beizer10.add(Eigen::Vector2d(-1, 1));
+    beizer10.add(Eigen::Vector2d(-2, 1));
+    beizer10.add(Eigen::Vector2d(-2, 2));
+    multiBeizer.add(beizer10);
+
+    BeizerCurve beizer11;
+    beizer11.add(Eigen::Vector2d(-2, 2));
+    beizer11.add(Eigen::Vector2d(-2, 3));
+    beizer11.add(Eigen::Vector2d(-1, 3));
+    beizer11.add(Eigen::Vector2d(0, 3));
+    multiBeizer.add(beizer11);
+
+    BeizerCurve beizer12;
+    beizer12.add(Eigen::Vector2d(0, 3));
+    beizer12.add(Eigen::Vector2d(1, 3));
+    multiBeizer.add(beizer12);
 
     std::vector<Eigen::Vector2d> path = multiBeizer.path();
     std::vector<Eigen::Vector2d> segment;
@@ -96,7 +116,9 @@ int main()
     ts.rotate(-90);
     ts.scale(1, -1);
     ts.translate(WINDOW_HEIGHT/-2, WINDOW_WIDTH/-2);
-    ts.scale(70, 70);
+    ts.scale(PX_PER_METER, PX_PER_METER);
+
+    ts.translate(0, 1);
 
     sf::Clock clock;
 

@@ -93,7 +93,12 @@ public:
 
         CppAD::AD<double> (*s)(CppAD::AD<double>) = [](CppAD::AD<double> x) { return CppAD::sin<double>(x); };
         CppAD::AD<double> (*c)(CppAD::AD<double>) = [](CppAD::AD<double> x) { return CppAD::cos<double>(x); };
+
+        #ifdef MPC_APPROXIMATE
+        model.updateApproximate(DT, s, c);
+        #else
         model.update(DT, s, c);
+        #endif // MPC_APPROXIMATE
 
         // Store the constraint expression of two consecutive states.
         // The idea here is to constraint this value to be 0.
@@ -207,15 +212,19 @@ void MPC::solve(const Eigen::VectorXd& K, double desiredSpeed)
     // options for IPOPT solver
     std::string options;
 
-    //options += "Retape  true\n";
-
     // Uncomment this if you'd like more print information
     options += "Integer print_level  0\n";
+
     // NOTE: Setting sparse to true allows the solver to take advantage
     // of sparse routines, this makes the computation MUCH FASTER.
-    //options += "Sparse  true        forward\n";
-    //options += "Sparse  true        reverse\n";
+
+    #ifdef MPC_APPROXIMATE
+    options += "Sparse  true        forward\n";
+    options += "Sparse  true        reverse\n";
+    #else
     options += "Retape true\n";
+    #endif // MPC_APPROXIMATE
+
     // NOTE: Currently the solver has a maximum time limit of 0.5 seconds.
     options += "Numeric max_cpu_time          0.5\n";
 

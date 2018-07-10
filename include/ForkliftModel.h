@@ -21,6 +21,7 @@ class ForkliftModel
         const double MAX_SPEED_DELTA = 0.8;
 
         void update(double dt, T (*SIN)(T), T (*COS)(T));
+        void updateApproximate(double dt, T (*SIN)(T), T (*COS)(T));
 
     protected:
 

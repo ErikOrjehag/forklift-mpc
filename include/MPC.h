@@ -5,9 +5,23 @@
 #include <cppad/ipopt/solve.hpp>
 #include "Forklift.h"
 
-#ifdef MPC_PRIVATE
+// Define this if you want to use an approximate model in the MPC algorithm
+#define MPC_APPROXIMATE
+
+
+#ifdef MPC_PRIVATE // This is set in MPC.cpp to make definitions only accessible to that file
+
+ // N - is how many states we "lookahead" in the future
+
+// Can use longer horizon with worse accuracy when using the approximate model
+#ifdef MPC_APPROXIMATE
+const double DT = 0.1;
+const int N = 10;
+#else
+// We need shorter horizon if we don't use approximate model
 const double DT = 0.2;
-const int N = 5; // How many states we "lookahead" in the future
+const int N = 5;
+#endif // MPC_APPROXIMATE
 
 const int NUMBER_OF_STATES = 7; // px, py, heading, steer, v, cte, eheading
 const int NUMBER_OF_ACTUATIONS = 2; // steer, v
