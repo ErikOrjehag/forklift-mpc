@@ -1,7 +1,7 @@
 
-# MPC Truck Simulator
+# MPC Forklift Simulator
 
-Simulator created to experiment with Model Predictive Control.
+Simulator created to experiment with Model Predictive Control of forklifts.
 
 ## Resources
 
