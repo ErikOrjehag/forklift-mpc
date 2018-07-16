@@ -103,12 +103,13 @@ Build options -> Search directories -> Compiler: C:\Users\bt6073\Desktop\Ipopt-3
 
 Build options -> Search directories -> Linker: C:\Users\bt6073\Desktop\Ipopt-3.12.10\build\prefix\lib64
 
-** Link libraries in CodeBlocks **
+**Link libraries in CodeBlocks**
 
 Add the following to Build options -> Linker settings -> Link libraries
 
 The ordering matters!
 
+```
 sfml-graphics
 sfml-window
 sfml-system
@@ -118,8 +119,7 @@ coinmumps
 coinblas
 coinmetis
 gfortran
-
-**Done!**
+```
 
 PS. I also tried to compile using TDM-GCC but I don't think that was used in the end. I'm leaving some instructions here just in case you want to try.
 
@@ -140,3 +140,6 @@ Download: https://www.coin-or.org/download/source/CppAD/cppad-20180000.0.gpl.tgz
 Build options -> Search directories -> Compiler: C:\Users\bt6073\Desktop\cppad-20180000.0
 
 No linked libraries (header only library)
+
+
+**Done!**
