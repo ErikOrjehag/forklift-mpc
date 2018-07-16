@@ -60,6 +60,7 @@
 		<Unit filename="include/MPC.h" />
 		<Unit filename="include/MultiBeizer.h" />
 		<Unit filename="include/NavError.h" />
+		<Unit filename="include/Pallet.h" />
 		<Unit filename="include/TransformStack.h" />
 		<Unit filename="include/Utils.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -73,6 +74,7 @@
 		<Unit filename="src/MPC.cpp" />
 		<Unit filename="src/MultiBeizer.cpp" />
 		<Unit filename="src/NavError.cpp" />
+		<Unit filename="src/Pallet.cpp" />
 		<Unit filename="src/TransformStack.cpp" />
 		<Unit filename="src/Utils.cpp" />
 		<Extensions>

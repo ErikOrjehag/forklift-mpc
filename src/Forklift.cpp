@@ -42,8 +42,8 @@ void Forklift::draw(sf::RenderWindow& window, TransformStack& ts)
     bodySide.setFillColor(sf::Color::Black);
 
     sf::RectangleShape fork;
-    fork.setSize(sf::Vector2f(1.2, 0.08));
-    fork.setPosition(sf::Vector2f(-1.2 + 0.5, -0.04));
+    fork.setSize(sf::Vector2f(1.3, 0.08));
+    fork.setPosition(sf::Vector2f(-1.3 + 0.7, -0.04));
     fork.setFillColor(sf::Color::Black);
 
     ts.push();

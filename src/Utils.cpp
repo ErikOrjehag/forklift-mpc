@@ -98,3 +98,25 @@ std::vector<Eigen::Vector2d> rollingWindowPath(const std::vector<Eigen::Vector2d
 
     return result;
 }
+
+
+Eigen::Vector2d angleToDir(double angle)
+{
+    return Eigen::Vector2d(cos(angle), sin(angle));
+}
+
+MultiBeizer pathFromTo(Eigen::Vector2d a, Eigen::Vector2d aDir, Eigen::Vector2d b, Eigen::Vector2d bDir)
+{
+    MultiBeizer result;
+    BeizerCurve curve;
+    BeizerCurve straight;
+    curve.add(a - aDir * 0.5);
+    curve.add(a + aDir * 0.5);
+    curve.add(b - bDir * 1.5);
+    curve.add(b - bDir * 1.2);
+    straight.add(b - bDir * 1.2);
+    straight.add(b);
+    result.add(curve);
+    result.add(straight);
+    return result;
+}

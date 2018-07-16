@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1531208258 source:c:\users\bt6073\desktop\codeblocks\mpc\main.cpp
+1531315982 source:c:\users\bt6073\desktop\codeblocks\mpc\main.cpp
 	<SFML/Graphics.hpp>
 	"Forklift.h"
 	"Frame.h"
@@ -11,6 +11,8 @@
 	<stdlib.h>
 	"MultiBeizer.h"
 	"Grid.h"
+	<algorithm>
+	"Pallet.h"
 
 1529046651 c:\users\bt6073\desktop\sfml-2.5.0\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -428,7 +430,7 @@
 	<SFML/Graphics.hpp>
 	<stack>
 
-1530792913 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forklift.cpp
+1531316391 source:c:\users\bt6073\desktop\codeblocks\mpc\src\forklift.cpp
 	"Forklift.h"
 	<iostream>
 	<cmath>
@@ -1183,7 +1185,7 @@
 	"NavError.h"
 	<iostream>
 
-1529942481 c:\users\bt6073\desktop\codeblocks\mpc\include\naverror.h
+1531317848 c:\users\bt6073\desktop\codeblocks\mpc\include\naverror.h
 	<Eigen/Dense>
 	<vector>
 	"Frame.h"
@@ -2330,10 +2332,10 @@
 
 1514799133 c:\users\bt6073\desktop\cppad-20180000.0\cppad\ipopt\solve_result.hpp
 
-1531219040 source:c:\users\bt6073\desktop\codeblocks\mpc\src\mpc.cpp
+1531304011 source:c:\users\bt6073\desktop\codeblocks\mpc\src\mpc.cpp
 	"MPC.h"
 
-1531219387 c:\users\bt6073\desktop\codeblocks\mpc\include\mpc.h
+1531297611 c:\users\bt6073\desktop\codeblocks\mpc\include\mpc.h
 	<cppad/cppad.hpp>
 	<cppad/ipopt/solve.hpp>
 	"Forklift.h"
@@ -2350,7 +2352,7 @@
 	<cppad/cppad.hpp>
 	<cmath>
 
-1531219603 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftmodel.h
+1531297341 c:\users\bt6073\desktop\codeblocks\mpc\include\forkliftmodel.h
 	<Eigen/Dense>
 
 1529930880 c:\users\bt6073\desktop\ipopt-3.7.1-win64-icl10.1\include\coin\ipipoptapplication.hpp
@@ -2612,21 +2614,22 @@
 	"IpSmartPtr.hpp"
 	<map>
 
-1530008554 c:\users\bt6073\desktop\codeblocks\mpc\include\utils.h
+1531302168 c:\users\bt6073\desktop\codeblocks\mpc\include\utils.h
 	<Eigen/Dense>
 	<vector>
 	<SFML/Graphics.hpp>
 	"TransformStack.h"
+	"MultiBeizer.h"
 
-1530528769 source:c:\users\bt6073\desktop\codeblocks\mpc\src\utils.cpp
+1531316278 source:c:\users\bt6073\desktop\codeblocks\mpc\src\utils.cpp
 	"Utils.h"
 	<algorithm>
 	<iostream>
 
-1530795122 source:c:\users\bt6073\desktop\codeblocks\mpc\src\multibeizer.cpp
+1531301488 source:c:\users\bt6073\desktop\codeblocks\mpc\src\multibeizer.cpp
 	"MultiBeizer.h"
 
-1530793445 c:\users\bt6073\desktop\codeblocks\mpc\include\multibeizer.h
+1531301460 c:\users\bt6073\desktop\codeblocks\mpc\include\multibeizer.h
 	"BeizerCurve.h"
 	<vector>
 	"TransformStack.h"
@@ -2640,4 +2643,14 @@
 	<SFML/Graphics.hpp>
 	"TransformStack.h"
 	<Eigen/Dense>
+
+1531314598 c:\users\bt6073\desktop\codeblocks\mpc\include\pallet.h
+	<SFML/Graphics.hpp>
+	"TransformStack.h"
+	<Eigen/Dense>
+
+1531315442 source:c:\users\bt6073\desktop\codeblocks\mpc\src\pallet.cpp
+	"Pallet.h"
+	<iostream>
+	"Frame.h"
 

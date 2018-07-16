@@ -12,10 +12,11 @@ class FG_eval
 public:
     typedef CPPAD_TESTVECTOR(CppAD::AD<double>) ADvector;
     const Eigen::VectorXd& K;
-    float desiredSpeed;
+    double desiredSpeed;
+    double distanceLeft;
 
-    FG_eval(const Eigen::VectorXd& K, float desiredSpeed)
-        : K(K), desiredSpeed(desiredSpeed)
+    FG_eval(const Eigen::VectorXd& K, double desiredSpeed, double distanceLeft)
+        : K(K), desiredSpeed(desiredSpeed), distanceLeft(distanceLeft)
     {
     }
 
@@ -28,8 +29,23 @@ public:
         for (int i = 0; i < N; i++) {
             const auto cte = x[ID_FIRST_cte + i];
             const auto eheading = x[ID_FIRST_eheading + i];
-            const auto v = x[ID_FIRST_v + i] - desiredSpeed;
-            fg[0] += (W_cte*cte*cte + W_eheading*eheading*eheading + W_v*v*v);
+            const auto steer = x[ID_FIRST_steer + i];
+            double W_s = 0;
+
+            double realDesiredSpeed = desiredSpeed;
+            double realW_v = W_v;
+
+            if (distanceLeft != -1) {
+                if (distanceLeft - x[ID_FIRST_px + i] > 0) {
+                    realDesiredSpeed = 0;
+                    //realW_v = W_v_stop;
+                    W_s = 1.0;
+                }
+            }
+
+            const auto v = x[ID_FIRST_v + i] - realDesiredSpeed;
+
+            fg[0] += (W_cte*cte*cte + W_eheading*eheading*eheading + realW_v*v*v + W_s*steer*steer);
         }
 
         // Cost of using actuations to correct the error
@@ -166,7 +182,7 @@ MPC::MPC(ForkliftModel<double>& model)
     }
 }
 
-void MPC::solve(const Eigen::VectorXd& K, double desiredSpeed)
+void MPC::solve(const Eigen::VectorXd& K, double desiredSpeed, double distanceLeft)
 {
     // In local frame of reference
     const double px = 0;
@@ -207,7 +223,7 @@ void MPC::solve(const Eigen::VectorXd& K, double desiredSpeed)
     //**************************************************************
 
     // object that computes objective and constraints
-    FG_eval fgEval(K, desiredSpeed);
+    FG_eval fgEval(K, desiredSpeed, distanceLeft);
 
     // options for IPOPT solver
     std::string options;
@@ -249,17 +265,20 @@ void MPC::solve(const Eigen::VectorXd& K, double desiredSpeed)
     ok &= solution.status == CppAD::ipopt::solve_result<Dvector>::success;
 
     if (ok) {
+        this->steer_ac = solution.x[ID_FIRST_steer_ac];
+        this->speed_ac = solution.x[ID_FIRST_v_ac];
         //std::cout << "OK! Cost:" << cost << std::endl;
     } else {
-        std::cout << "SOMETHING IS WRONG!" << cost << std::endl;
+        this->steer_ac = 0;
+        this->speed_ac = 0;
+        std::cout << "SOMETHING IS WRONG! cost: " << cost << ", unknown: " << (solution.status == CppAD::ipopt::solve_result<Dvector>::unknown) << std::endl;
     }
 
     //**************************************************************
     //* STORE RELEVANT INFORMATION FROM SOLUTION
     //**************************************************************
 
-    this->steer_ac = solution.x[ID_FIRST_steer_ac];
-    this->speed_ac = solution.x[ID_FIRST_v_ac];
+
 
     //std::cout << "result (steer_ac: " << this->steer_ac << ", speed_ac: " << this->speed_ac << ")" << std::endl;
 

@@ -58,6 +58,11 @@ void MultiBeizer::deletePoint()
     }
 }
 
+void MultiBeizer::clear()
+{
+    curves.clear();
+}
+
 std::vector<Eigen::Vector2d> MultiBeizer::path()
 {
     std::vector<Eigen::Vector2d> path;

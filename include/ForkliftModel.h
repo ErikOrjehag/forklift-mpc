@@ -17,7 +17,7 @@ class ForkliftModel
 
         const double MAX_STEER = M_PI / 2;
         const double MAX_STEER_DELTA = 50 * M_PI / 180;
-        const double MAX_SPEED = 0.8;
+        const double MAX_SPEED = 0.5;
         const double MAX_SPEED_DELTA = 0.8;
 
         void update(double dt, T (*SIN)(T), T (*COS)(T));

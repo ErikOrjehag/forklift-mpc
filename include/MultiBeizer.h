@@ -18,6 +18,7 @@ class MultiBeizer
         void commitBeizer();
         void abortBeizer();
         void deletePoint();
+        void clear();
         std::vector<Eigen::Vector2d> path();
         void draw(sf::RenderWindow& window, TransformStack& ts);
 

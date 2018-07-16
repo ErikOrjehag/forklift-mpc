@@ -6,7 +6,7 @@
 #include "Forklift.h"
 
 // Define this if you want to use an approximate model in the MPC algorithm
-#define MPC_APPROXIMATE
+// --> #define MPC_APPROXIMATE
 
 
 #ifdef MPC_PRIVATE // This is set in MPC.cpp to make definitions only accessible to that file
@@ -42,6 +42,7 @@ const int ID_FIRST_v_ac = ID_FIRST_steer_ac + N - 1;
 const double W_cte = 1000.0;
 const double W_eheading = 150.0;
 const double W_v = 50.0;
+const double W_v_stop = 2000.0;
 const double W_steer = 0.4;
 const double W_steer_ac = 0.2;
 const double W_v_ac = 0.2;
@@ -56,7 +57,7 @@ class MPC
     public:
         MPC(ForkliftModel<double>& model);
 
-        void solve(const Eigen::VectorXd& K, double desiredSpeed);
+        void solve(const Eigen::VectorXd& K, double desiredSpeed, double distanceLeft = -1);
 
         void draw(sf::RenderWindow& window, TransformStack& ts);
 

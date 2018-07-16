@@ -5,6 +5,12 @@
 #include <vector>
 #include "Frame.h"
 
+/*
+
+    DEPRICATED
+
+*/
+
 class NavError
 {
     public:

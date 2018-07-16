@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include "MultiBeizer.h"
 #include "Grid.h"
+#include <algorithm>
+#include "Pallet.h"
 
 const int WINDOW_WIDTH = 960;
 const int WINDOW_HEIGHT = 600;
@@ -17,14 +19,23 @@ const int PX_PER_METER = 70;
 
 int main()
 {
+    bool pickPalletDemo = false;
+
     bool automatic = false;
     int autoDirection = 1; // forward: 1, reverse: -1
 
     Forklift forklift;
-    forklift.steer = 45 * M_PI / 180;
-    forklift.model.position[0] = 1.5;
-    forklift.model.position[1] = 2.9;
-    forklift.model.heading = 20 * M_PI / 180;
+    forklift.steer = 10 * M_PI / 180;
+
+    if (pickPalletDemo) {
+        forklift.model.position[0] = -2.5;
+        forklift.model.position[1] = -5;
+        forklift.model.heading = (180 + 40) * M_PI / 180;
+    } else {
+        forklift.model.position[0] = 1.5;
+        forklift.model.position[1] = 2.9;
+        forklift.model.heading = 20 * M_PI / 180;
+    }
 
     Grid grid;
 
@@ -122,6 +133,8 @@ int main()
 
     sf::Clock clock;
 
+    Pallet pallet;
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -130,15 +143,38 @@ int main()
             if (event.type == sf::Event::Closed) {
                 window.close();
 
+            } else if (event.type == sf::Event::MouseButtonReleased) {
+
+                if (event.mouseButton.button == sf::Mouse::Left) {
+
+                    if (pickPalletDemo) {
+                        sf::Vector2f p = static_cast<sf::Transform>(ts).getInverse().transformPoint(event.mouseButton.x, event.mouseButton.y);
+                        Eigen::Vector2d mouse(p.x, p.y);
+
+                        Eigen::Vector2d targetDir = (mouse - pallet.position);
+                        targetDir.normalize();
+                        pallet.heading = std::atan2(targetDir[1], targetDir[0]) + M_PI;
+
+                        multiBeizer = pathFromTo(forklift.model.position, angleToDir(forklift.model.heading + M_PI), pallet.position, targetDir);
+                        path = multiBeizer.path();
+                    }
+                }
+
             } else if (event.type == sf::Event::MouseButtonPressed) {
 
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     sf::Vector2f p = static_cast<sf::Transform>(ts).getInverse().transformPoint(event.mouseButton.x, event.mouseButton.y);
-                    Eigen::Vector2d point(p.x, p.y);
-                    if (grid.isActive()) {
-                        grid.snapPoint(point);
+                    Eigen::Vector2d mouse(p.x, p.y);
+
+                    if (pickPalletDemo) {
+                        pallet.position = mouse;
+                    } else {
+                        if (grid.isActive()) {
+                            grid.snapPoint(mouse);
+                        }
+                        multiBeizer.inputPoint(mouse);
                     }
-                    multiBeizer.inputPoint(point);
+
                 }
 
             } else if (event.type == sf::Event::KeyReleased) {
@@ -197,13 +233,15 @@ int main()
 
         float dt = clock.restart().asSeconds();
 
-        /*Frame f;
+        /*
+        DEPRICATED
+        Frame f;
         f.pos = forklift.model.position;
         f.angle = forklift.model.heading;
         NavError navError = NavError::calcNavError(curve, f);*/
 
         segment = transformPointsIntoFrame(path, forklift.model.position, forklift.model.heading);
-        segment = rollingWindowPath(segment, 1.0, 1.0);
+        segment = rollingWindowPath(segment, 0.2, 1.0);
 
         const int ORDER = 3;
         Eigen::VectorXd K = polyfit(segment, ORDER);
@@ -215,7 +253,11 @@ int main()
         }
 
         if (automatic) {
-            mpc.solve(K, forklift.model.MAX_SPEED * autoDirection);
+            double distanceLeft = -1;
+            if (pickPalletDemo) {
+                    distanceLeft = segment[segment.size() - 1][0] + 0.1;
+            }
+            mpc.solve(K, forklift.model.MAX_SPEED * autoDirection, distanceLeft);
             forklift.speed += mpc.speed_ac * dt;
             forklift.steer += mpc.steer_ac * dt;
         } else {
@@ -232,7 +274,7 @@ int main()
         }
         globalFrame.draw(window, ts);
         multiBeizer.draw(window, ts);
-        //navError.draw(window, ts);
+        // DEPRICATED: navError.draw(window, ts);
         forklift.draw(window, ts);
 
         ts.push();
@@ -242,6 +284,8 @@ int main()
         drawPath(window, ts, segment, sf::Color::Black);
         mpc.draw(window, ts);
         ts.pop();
+
+        pallet.draw(window, ts);
 
         window.display();
     }
