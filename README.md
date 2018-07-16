@@ -5,9 +5,8 @@ Simulator created to experiment with Model Predictive Control of forklifts.
 
 ## Resources
 
-**MPC Car Simulator**
-
-https://github.com/mithi/mpc
+**Udacity course code** - https://github.com/udacity/CarND-MPC-Quizzes/tree/master/mpc_to_line/solution
+**MPC Car Simulator** - https://github.com/mithi/mpc
 
 ## Tools
 
