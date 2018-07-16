@@ -103,6 +103,16 @@ Build options -> Search directories -> Compiler: C:\Users\bt6073\Desktop\Ipopt-3
 
 Build options -> Search directories -> Linker: C:\Users\bt6073\Desktop\Ipopt-3.12.10\build\prefix\lib64
 
+*PS.* I also tried to compile using TDM-GCC but I don't think that was used in the end. I'm leaving some instructions here just in case you want to try.
+
+Install TDM-GCC.
+
+Make sure TDM-GCC is used by editing: C/MinGW/msys/1.0/etc/fstab
+
+It should say: C:/TDM-GCC-64     /mingw
+
+Start: C:\MinGW\msys\1.0\msys.bat
+
 **Link libraries in CodeBlocks**
 
 Add the following to Build options -> Linker settings -> Link libraries
@@ -120,16 +130,6 @@ coinblas
 coinmetis
 gfortran
 ```
-
-PS. I also tried to compile using TDM-GCC but I don't think that was used in the end. I'm leaving some instructions here just in case you want to try.
-
-Install TDM-GCC.
-
-Make sure TDM-GCC is used by editing: C/MinGW/msys/1.0/etc/fstab
-
-It should say: C:/TDM-GCC-64     /mingw
-
-Start: C:\MinGW\msys\1.0\msys.bat
 
 **CppAD** - For interfacing with IPOPT
 
