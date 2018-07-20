@@ -111,10 +111,10 @@ MultiBeizer pathFromTo(Eigen::Vector2d a, Eigen::Vector2d aDir, Eigen::Vector2d 
     BeizerCurve curve;
     BeizerCurve straight;
     curve.add(a - aDir * 0.5);
-    curve.add(a + aDir * 0.5);
+    curve.add(a + aDir * 1.5);
+    curve.add(b - bDir * 2.5);
     curve.add(b - bDir * 1.5);
-    curve.add(b - bDir * 1.2);
-    straight.add(b - bDir * 1.2);
+    straight.add(b - bDir * 1.5);
     straight.add(b);
     result.add(curve);
     result.add(straight);

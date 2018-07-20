@@ -19,7 +19,7 @@ const int PX_PER_METER = 70;
 
 int main()
 {
-    bool pickPalletDemo = false;
+    bool pickPalletDemo = true;
 
     bool automatic = false;
     int autoDirection = 1; // forward: 1, reverse: -1
